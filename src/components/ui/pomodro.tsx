@@ -1,9 +1,6 @@
-"use client"; // Enables client-side rendering for this component
+"use client"; 
 
-// Import necessary hooks from React
 import React, { useState, useEffect, useRef } from "react";
-
-// Import custom UI components and icons from the UI directory and Lucide React library
 import { Button } from "@/components/ui/button";
 import {
   MinusIcon,
@@ -25,11 +22,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert";
 
-// Define types for the timer status and session type
 type TimerStatus = "idle" | "running" | "paused";
 type SessionType = "work" | "break";
 
-// Define a TypeScript interface for the Pomodoro state
 interface PomodoroState {
   workDuration: number;
   breakDuration: number;
@@ -38,9 +33,7 @@ interface PomodoroState {
   timerStatus: TimerStatus;
 }
 
-// Default export of the PomodoroTimerComponent function
 export default function PomodoroTimer() {
-  // State hooks for managing the Pomodoro timer state
   const [state, setState] = useState<PomodoroState>({
     workDuration: 25 * 60,
     breakDuration: 5 * 60,
@@ -49,10 +42,8 @@ export default function PomodoroTimer() {
     timerStatus: "idle",
   });
 
-  // Reference for storing the timer interval
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Effect hook to handle the timer logic
   useEffect(() => {
     if (state.timerStatus === "running" && state.currentTime > 0) {
       timerRef.current = setInterval(() => {
@@ -68,7 +59,6 @@ export default function PomodoroTimer() {
     return () => clearInterval(timerRef.current as NodeJS.Timeout);
   }, [state.timerStatus, state.currentTime]);
 
-  // Function to handle switching between work and break sessions
   const handleSessionSwitch = (): void => {
     setState((prevState) => {
       const isWorkSession = prevState.currentSession === "work";
@@ -82,7 +72,6 @@ export default function PomodoroTimer() {
     });
   };
 
-  // Function to handle start and pause actions
   const handleStartPause = (): void => {
     if (state.timerStatus === "running") {
       setState((prevState) => ({
@@ -98,7 +87,6 @@ export default function PomodoroTimer() {
     }
   };
 
-  // Function to reset the timer
   const handleReset = (): void => {
     clearInterval(timerRef.current as NodeJS.Timeout);
     setState((prevState) => ({
@@ -109,11 +97,7 @@ export default function PomodoroTimer() {
     }));
   };
 
-  // Function to handle changes in duration for work and break sessions
-  const handleDurationChange = (
-    type: SessionType,
-    increment: boolean
-  ): void => {
+  const handleDurationChange = (type: SessionType, increment: boolean): void => {
     setState((prevState) => {
       const durationChange = increment ? 60 : -60;
       if (type === "work") {
@@ -138,7 +122,6 @@ export default function PomodoroTimer() {
     });
   };
 
-  // Function to format time in mm:ss format
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -147,16 +130,18 @@ export default function PomodoroTimer() {
       .padStart(2, "0")}`;
   };
 
-  // JSX return statement rendering the Pomodoro timer UI
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-blue-100 dark:bg-gray-900">
       {/* Center the Pomodoro timer card within the screen */}
       <Card className="w-full max-w-md p-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg">
         <div className="flex flex-col items-center justify-center gap-6">
-          <h1 className="text-4xl font-bold">Pomodoro Timer</h1>
-          <p>A timer for the Pomodoro Technique.</p>
+          <h1 className="text-4xl font-bold text-orange-800 dark:text-white">
+            Pomodoro Timer
+          </h1>
+          <p className="text-cyan-600 dark:text-cyan-300">
+            A timer for the Pomodoro Technique.
+          </p>
           <div className="flex flex-col items-center gap-4">
-            {/* Display current session (work or break) */}
             <div className="text-2xl font-medium">
               <span
                 className={`text-${
@@ -166,83 +151,74 @@ export default function PomodoroTimer() {
                 {state.currentSession === "work" ? "Work" : "Break"}
               </span>
             </div>
-            {/* Display formatted time */}
-            <div className="text-8xl font-bold">
+            <div className="text-8xl font-bold text-gray-900 dark:text-white">
               {formatTime(state.currentTime)}
             </div>
           </div>
           <div className="flex items-center gap-4">
-            {/* Buttons to change duration, start/pause, and reset timer */}
             <Button
-              variant="outline"
-              size="icon"
+              className="bg-blue-500 hover:bg-blue-600 text-white rounded-full"
               onClick={() => handleDurationChange("work", false)}
             >
               <MinusIcon className="h-6 w-6" />
             </Button>
             <Button
-              variant="outline"
-              size="icon"
+              className="bg-blue-500 hover:bg-blue-600 text-white rounded-full"
               onClick={() => handleDurationChange("work", true)}
             >
               <PlusIcon className="h-6 w-6" />
             </Button>
-            <Button variant="outline" size="icon" onClick={handleStartPause}>
+            <Button
+              className={`${
+                state.timerStatus === "running"
+                  ? "bg-yellow-500 hover:bg-yellow-600"
+                  : "bg-green-500 hover:bg-green-600"
+              } text-white rounded-full`}
+              onClick={handleStartPause}
+            >
               {state.timerStatus === "running" ? (
                 <PauseIcon className="h-6 w-6" />
               ) : (
                 <PlayIcon className="h-6 w-6" />
               )}
             </Button>
-            <Button variant="outline" size="icon" onClick={handleReset}>
+            <Button
+              className="bg-red-500 hover:bg-red-600 text-white rounded-full"
+              onClick={handleReset}
+            >
               <RefreshCwIcon className="h-6 w-6" />
             </Button>
           </div>
           <div className="p-2">
-            {/* AlertDialog for explaining the Pomodoro Technique */}
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="default">What is Pomodoro Technique?</Button>
+                <Button className="bg-gray-800 text-white hover:bg-gray-700">
+                  What is Pomodoro Technique?
+                </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent className="w-full max-w-2xl p-4 md:p-6">
+              <AlertDialogContent className="w-full max-w-2xl p-4 md:p-6 bg-white dark:bg-gray-700">
                 <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    <strong> ➡️ Explanation of Pomodoro Technique 🔥</strong>
+                  <AlertDialogTitle className="text-gray-900 dark:text-white">
+                    <strong>➡️ Explanation of Pomodoro Technique 🔥</strong>
                   </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    <strong>The Pomodoro Technique </strong>
-                    {`
- is a time management method that uses a timer to break work into 
-intervals called Pomodoros. The Pomodoro timer is traditionally set for 25 minutes,
-but can be customized to fit your needs. The basic steps are:
-`}{" "}
-                    <br />
-                    <br />
+                  <AlertDialogDescription className="text-gray-800 dark:text-gray-300">
+                    <strong>The Pomodoro Technique</strong>
+                    {` is a time management method that uses a timer to break work into intervals...`}
                     <ol>
-                      <strong>
-                        <li>1. Select a single task to focus on.</li>
-                        <li>
-                          2. Set a timer for 25-30 min. and work continuously
-                          until the timer goes off.
-                        </li>
-                        <li>
-                          3. Take a productive 5 min. break-walk around, get a
-                          snack, relax.
-                        </li>
-                        <li>4. Repeat steps 2 & 3 for 4 rounds.</li>
-                        <li>5. Take a longer (20-30 min.) break.</li>
-                      </strong>
+                      <li>1. Select a single task to focus on.</li>
+                      <li>2. Set a timer for 25-30 minutes...</li>
+                      <li>3. Take a 5-minute break...</li>
+                      <li>4. Repeat for 4 rounds...</li>
+                      <li>5. Take a longer break...</li>
                     </ol>
-                    <br />
                     <Button>
-                      {" "}
                       <a
                         href="https://todoist.com/productivity-methods/pomodoro-technique"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
                         Click Here to Read more!
-                      </a>{" "}
+                      </a>
                     </Button>
                   </AlertDialogDescription>
                 </AlertDialogHeader>
